@@ -1,0 +1,59 @@
+<html>
+<head profile="http://www.w3.org/2005/10/profile">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-164510568-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-164510568-1');
+</script>
+
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<link rel="icon" type="image/png" href="../short_logo_trans.png">
+<link rel="stylesheet" type="text/css" href="../styles.css">
+<title>SmartAtHome.co.uk - My Hive Login</title>
+<script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script src="../general_functions.js"></script>
+<script src="functions.js"></script>
+<script src="crypto-js.js"></script>
+<script>
+//user_info = login()
+//device_list = get_device_list(user_info)
+//ws_info = get_ws_info(user_info)
+//ws = get_ws(user_info, ws_info)
+//switch_device(device_list[0], ws, 'on')
+
+$( document ).ready(function() {
+	document.getElementById('password').onkeydown = function(e){if(e.keyCode == 13){login();}};
+});
+
+</script>
+</head>
+<body>
+<div data-role="page">
+<center><a href='../index.html'><img src="../long_logo.png"></a><br /><br />
+<div id="loginstate">
+You are not logged in. <br /><br />
+<label class='l1' for='username'>Sonoff Username: </label><input id='username'><br />
+<label class='l1' for='password'>Sonoff Password: </label><input type='password' id='password'><br /><br />
+<input type='submit' value='Submit' onclick='return do_login();'>
+ <a href='safe.html'>Is this safe?</a>
+</div>
+<div id="switches"></div>
+<div id="myCookieConsent">
+<a id="cookieButton" onClick="acceptCookies()">Understood</a>
+<div>This website is using cookies. <a href="../cookies.html">More details</a></div>
+</div>
+
+</div><!-- /page -->
+</body></html>
