@@ -27,15 +27,11 @@
 <script src="functions.js"></script>
 <script src="crypto-js.js"></script>
 <script>
-//user_info = login()
-//device_list = get_device_list(user_info)
-//ws_info = get_ws_info(user_info)
-//ws = get_ws(user_info, ws_info)
-//switch_device(device_list[0], ws, 'on')
 
 var user_info = {};
 
 $( document ).ready(function() {
+	testFirstCookie();
 	document.getElementById('password').onkeydown = function(e){if(e.keyCode == 13){do_login();}};
 	user_info = {'bearer_token': getCookie('bearer_token'), 'user_apikey': getCookie('user_apikey')};
 	console.log(user_info);
@@ -63,11 +59,10 @@ $( document ).ready(function() {
 <div id='loginfailed'></div>
 </div>
 <div class='hidden' id="switches">
-Your devices:</div>
+Your devices:</div></center>
 <div id="myCookieConsent">
 <a id="cookieButton" onClick="acceptCookies()">Understood</a>
 <div>This website is using cookies. <a href="../cookies.html">More details</a></div>
 </div>
-
 </div><!-- /page -->
 </body></html>
