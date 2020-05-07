@@ -6,10 +6,7 @@ const romVersion = '11.1.2';
 const appVersion = '3.5.3';
 const apkVersion = '1.8';
 const version = 6;
-var proxyurl = '';
-if (location.port >= 8000) {
-	proxyurl = "https://cors-anywhere.herokuapp.com/";
-}
+var proxyurl = "https://cors-anywhere.herokuapp.com/";
 
 function uuidv4() {
 	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
