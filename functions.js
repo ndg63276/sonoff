@@ -150,10 +150,17 @@ function get_ws(user_info) {
 		console.log('ws open');
 		ws.send(JSON.stringify(payload));
 	}
+	ws.onclose = function (event) {
+		console.log('ws closed. Reconnect will be attempted in 1 second.', event.reason);
+		setTimeout(function() {
+			user_info['ws'] = get_ws(user_info);
+		}, 1000);
+	};
 	return ws;
 }
 
-function switch_device(device, ws, new_state) {
+function switch_device(device, user_info, new_state) {
+	var ws = user_info['ws'];
 	payload = {
 		'action'        : 'update',
 		'userAgent'     : 'app',
@@ -236,7 +243,7 @@ function toggle(device_no) {
 	} else {
 		new_state = 'off';
 	}
-	switch_device(device, user_info['ws'], new_state);
+	switch_device(device, user_info, new_state);
 	update_devices(user_info, true);
 }
 
@@ -246,6 +253,4 @@ function on_logout() {
 	var login = document.getElementById('login');
 	login.classList.remove('hidden');
 }
-	//ws = get_ws(user_info, ws_info)
-	//switch_device(device_list[0], ws, 'on')
 
