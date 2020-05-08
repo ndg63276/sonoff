@@ -23,8 +23,8 @@ function generate_nonce() {
 	return Math.floor(Math.random()*1e15).toString();
 }
 
-function login(username, password) {
-	var to_return = {};
+function login(username, password, region) {
+	var to_return = {'region': region};
 	var app_details = {
 		'email': username,
 		'password': password,
@@ -48,7 +48,7 @@ function login(username, password) {
 		'Authorization' : 'Sign ' + sign,
 		'Content-Type'  : 'application/json;charset=UTF-8'
 	}
-	var url = 'https://eu-api.coolkit.cc:8080/api/user/login'
+	var url = 'https://'+region+'-api.coolkit.cc:8080/api/user/login'
 	$.ajax({
 		url: proxyurl+url,
 		type: 'POST',
@@ -60,9 +60,10 @@ function login(username, password) {
 			console.log(json);
 			if ('at' in json) {
 				to_return['bearer_token'] = json['at'];
-				setCookie('bearer_token', json['at'], 1);
+				setCookie('bearer_token', json['at'], 24*365);
 				to_return['user_apikey'] = json['user']['apikey'];
-				setCookie('user_apikey', json['user']['apikey'], 1)
+				setCookie('user_apikey', json['user']['apikey'], 24*365)
+				setCookie('region', region, 24*365)
 				to_return['logged_in'] = true;
 			} else {
 				to_return['logged_in'] = false;
@@ -77,16 +78,9 @@ function get_device_list(user_info) {
 	query_params = {
 		'lang': 'en',
 		'version': version,
-		'ts': get_time(),
-		'nonce': generate_nonce(),
 		'appid': appid,
-		'imei': imei,
-		'os': os,
-		'model': model,
-		'romVersion': romVersion,
-		'appVersion': appVersion
 	}
-	var url = 'https://eu-api.coolkit.cc:8080/api/user/device';
+	var url = 'https://'+user_info['region']+'-api.coolkit.cc:8080/api/user/device';
 	var headers = {
 		'Authorization' : 'Bearer ' + user_info['bearer_token'],
 		'Content-Type'  : 'application/json;charset=UTF-8'
@@ -111,23 +105,31 @@ function get_device_list(user_info) {
 	return to_return
 }
 
-function get_ws_address(user_info) {
-	var to_return = '';
-	var url = 'https://eu-disp.coolkit.cc:8080/dispatch/app';
-	$.ajax({
-		url: proxyurl+url,
-		type: 'GET',
-		dataType: 'json',
-		async: false,
-		success: function (json) {
-			console.log(json);
-			to_return = 'wss://'+json['domain']+':'+json['port']+'/api/ws';
-		}
-	});
-	return to_return;
+function get_ws_address(user_info, lookup) {
+	if (lookup == true) {
+		var to_return = '';
+		var url = 'https://'+user_info['region']+'-disp.coolkit.cc:8080/dispatch/app';
+		$.ajax({
+			url: proxyurl+url,
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			success: function (json) {
+				console.log(json);
+				to_return = 'wss://'+json['domain']+':'+json['port']+'/api/ws';
+			}
+		});
+		return to_return;
+	} else {
+		var domain = user_info['region']+'-pconnect'+Math.ceil(Math.random()*3)+'.coolkit.cc';
+		return 'wss://'+domain+':8080/api/ws';
+	}
 }
 
-function get_ws(user_info) {
+function get_ws(user_info, lookup) {
+	if (lookup == true) {
+		user_info['ws_address'] = get_ws_address(user_info, lookup)
+	}
 	ws = new WebSocket(user_info['ws_address'])
 	payload = {
 		'action'    : 'userOnline',
@@ -153,7 +155,7 @@ function get_ws(user_info) {
 	ws.onclose = function (event) {
 		console.log('ws closed. Reconnect will be attempted in 1 second.', event.reason);
 		setTimeout(function() {
-			user_info['ws'] = get_ws(user_info);
+			user_info['ws'] = get_ws(user_info, true);
 		}, 1000);
 	};
 	return ws;
@@ -181,7 +183,8 @@ function switch_device(device, user_info, new_state) {
 function do_login() {
 	var username = document.getElementById("username").value;
 	var password = document.getElementById("password").value;
-	user_info = login(username, password)
+	var region = document.getElementById("region").value;
+	user_info = login(username, password, region);
 	if (user_info['logged_in'] == true) {
 		device_list = get_device_list(user_info);
 		user_info['devices'] = device_list['devices']
