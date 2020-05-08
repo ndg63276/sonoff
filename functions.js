@@ -1,26 +1,10 @@
 const appid = 'oeVkj2lYFGnJu5XUtWisfW4utiN4u9Mq';
-const imei = uuidv4();
-const os = 'iOS';
-const model = 'iPhone10,6';
-const romVersion = '11.1.2';
-const appVersion = '3.5.3';
-const apkVersion = '1.8';
 const version = 6;
 var proxyurl = "https://cors-anywhere.herokuapp.com/";
-
-function uuidv4() {
-	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-	);
-}
 
 function get_time() {
 	var now = new Date();
 	return Math.floor(now.getTime()/1000);
-}
-
-function generate_nonce() {
-	return Math.floor(Math.random()*1e15).toString();
 }
 
 function login(username, password, region) {
@@ -28,15 +12,8 @@ function login(username, password, region) {
 	var app_details = {
 		'email': username,
 		'password': password,
-		'version': version,
 		'ts': get_time(),
-		'nonce': generate_nonce(),
 		'appid': appid,
-		'imei': imei,
-		'os': os,
-		'model': model,
-		'romVersion': romVersion,
-		'appVersion': appVersion
 	}
 	var secret="6Nz4n0xA8s8qdxQf2GqurZj2Fs55FUvM";
 	var nonce = JSON.stringify(app_details);
@@ -134,16 +111,8 @@ function get_ws(user_info, lookup) {
 	payload = {
 		'action'    : 'userOnline',
 		'userAgent' : 'app',
-		'version'   : version,
-		'nonce'     : generate_nonce(),
-		'apkVersion': apkVersion,
-		'os'        : os,
 		'at'        : user_info['bearer_token'],
 		'apikey'    : user_info['user_apikey'],
-		'ts'        : get_time(),
-		'model'     : model,
-		'romVersion': romVersion,
-		'sequence'  : get_time()
 	}
 	ws.onmessage = function (event) {
 		console.log(event.data);
@@ -170,7 +139,6 @@ function switch_device(device, user_info, new_state) {
 		'apikey'        : device['apikey'],
 		'deviceid'      : device['deviceid'],
 		'sequence'      : get_time(),
-		'ts'		: 0
         }
         if ('controlType' in device['params']) {
         	payload['controlType'] = device['params']['controlType'];
