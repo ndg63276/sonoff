@@ -153,17 +153,25 @@ function switch_device(device, user_info, new_state) {
 }
 
 function do_login() {
+	var login_div = document.getElementById("login");
+	login_div.classList.add('hidden');
+	var loader_div = document.getElementById("loader");
+	loader_div.classList.remove('hidden');
 	var username = document.getElementById("username").value;
 	var password = document.getElementById("password").value;
 	var region = document.getElementById("region").value;
-	user_info = login(username, password, region);
-	if (user_info['logged_in'] == true) {
-		device_list = get_device_list(user_info);
-		user_info['devices'] = device_list['devices']
-		on_login(user_info);
-	} else {
-		document.getElementById('loginfailed').innerHTML = 'Login failed';
-	}
+	setTimeout(function(){
+		user_info = login(username, password, region);
+		if (user_info['logged_in'] == true) {
+			device_list = get_device_list(user_info);
+			user_info['devices'] = device_list['devices']
+			on_login(user_info);
+		} else {
+			login_div.classList.remove('hidden');
+			document.getElementById('loginfailed').innerHTML = 'Login failed';
+		}
+		loader_div.classList.add('hidden');
+	}, 1);
 }
 
 function check_login(user_info) {
@@ -178,8 +186,8 @@ function check_login(user_info) {
 }
 
 function on_login(user_info) {
-	var login = document.getElementById('login');
-	login.classList.add('hidden');
+	var login_div = document.getElementById('login');
+	login_div.classList.add('hidden');
 	var switches = document.getElementById('switches');
 	switches.classList.remove('hidden');
 	update_devices(user_info);
