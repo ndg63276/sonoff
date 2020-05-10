@@ -170,7 +170,6 @@ function do_login() {
 			login_div.classList.remove('hidden');
 			document.getElementById('loginfailed').innerHTML = 'Login failed';
 		}
-		loader_div.classList.add('hidden');
 	}, 1);
 }
 
@@ -190,6 +189,8 @@ function on_login(user_info) {
 	login_div.classList.add('hidden');
 	var switches = document.getElementById('switches');
 	switches.classList.remove('hidden');
+	var loader_div = document.getElementById('loader');
+	loader_div.classList.add('hidden');
 	update_devices(user_info);
 	user_info['ws_address'] = get_ws_address(user_info);
 	user_info['ws'] = get_ws(user_info);
@@ -216,6 +217,7 @@ function update_devices(user_info, force_update) {
 			switches.innerHTML += '<a href="#" class="ui-btn ui-btn-inline ui-icon-power ui-btn-icon-left" onclick="toggle('+device+');">On</a>';
 		}
 	}
+	setTimeout(update_devices, 10000, user_info, true);
 }
 
 function toggle(device_no) {
