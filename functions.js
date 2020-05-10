@@ -10,10 +10,14 @@ function get_time() {
 function login(username, password, region) {
 	var to_return = {'region': region};
 	var app_details = {
-		'email': username,
 		'password': password,
 		'ts': get_time(),
 		'appid': appid,
+	}
+	if (username.indexOf("@") > -1) {
+		app_details["email"] = username;
+	} else {
+		app_details["phoneNumber"] = username;
 	}
 	var secret="6Nz4n0xA8s8qdxQf2GqurZj2Fs55FUvM";
 	var nonce = JSON.stringify(app_details);
