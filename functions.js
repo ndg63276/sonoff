@@ -167,10 +167,10 @@ function do_login() {
 			user_info['devices'] = device_list['devices']
 			on_login(user_info);
 		} else {
-			login_div.classList.remove('hidden');
+			on_logout();
 			document.getElementById('loginfailed').innerHTML = 'Login failed';
 		}
-	}, 1);
+	}, 100);
 }
 
 function check_login(user_info) {
@@ -235,7 +235,9 @@ function toggle(device_no) {
 function on_logout() {
 	var switches = document.getElementById('switches');
 	switches.classList.add('hidden');
-	var login = document.getElementById('login');
-	login.classList.remove('hidden');
+	var login_div = document.getElementById('login');
+	login_div.classList.remove('hidden');
+	var loader_div = document.getElementById('loader');
+	loader_div.classList.add('hidden');
 }
 
