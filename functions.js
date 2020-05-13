@@ -191,12 +191,12 @@ function on_login(user_info) {
 	switches.classList.remove("hidden");
 	var loader_div = document.getElementById("loader");
 	loader_div.classList.add("hidden");
-	update_devices(user_info);
+	update_devices(user_info, false, true);
 	user_info["ws_address"] = get_ws_address(user_info);
 	user_info["ws"] = get_ws(user_info);
 }
 
-function update_devices(user_info, force_update) {
+function update_devices(user_info, force_update, loop) {
 	if (force_update == true) {
 		device_list = get_device_list(user_info);
 		user_info["devices"] = device_list["devices"];
@@ -218,7 +218,9 @@ function update_devices(user_info, force_update) {
 	}
 	switchesHTML += "</table>";
 	document.getElementById("switches").innerHTML = switchesHTML;
-	setTimeout(update_devices, 10000, user_info, true);
+	if (loop == true) {
+		setTimeout(update_devices, 10000, user_info, true, true);
+	}
 }
 
 function toggle(device_no) {
@@ -230,7 +232,7 @@ function toggle(device_no) {
 		new_state = "off";
 	}
 	switch_device(device, user_info, new_state);
-	update_devices(user_info, true);
+	update_devices(user_info, true, false);
 }
 
 function on_logout() {
