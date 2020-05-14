@@ -41,8 +41,7 @@ $( document ).ready(function() {
 	user_info = {"bearer_token": getCookie("bearer_token"), "user_apikey": getCookie("user_apikey"), "region": getCookie("region")};
 	console.log(user_info);
 	logged_in = check_login(user_info);
-	if (logged_in["success"] == true) {
-		user_info["devices"] = logged_in["devices"];
+	if (logged_in == true) {
 		on_login(user_info);
 		user_info["logged_in"] = true;
 	} else {

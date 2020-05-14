@@ -119,7 +119,15 @@ function get_ws(user_info, lookup) {
 		"apikey"    : user_info["user_apikey"],
 	}
 	ws.onmessage = function (event) {
-		console.log(event.data);
+		var data = JSON.parse(event["data"]);
+		console.log(data);
+		if ("action" in data && data["action"] == "update") {
+			var device_id = data["deviceid"];
+			var new_state = data["params"]["switch"];
+			var device = user_info["devices"][device_id];
+			device["params"]["switch"] = new_state;
+			redraw_devices(user_info);
+		}
 	}
 	ws.onopen = function (event) {
 		console.log("ws open");
@@ -136,20 +144,25 @@ function get_ws(user_info, lookup) {
 
 function switch_device(device, user_info, new_state) {
 	var ws = user_info["ws"];
-	payload = {
-		"action"        : "update",
-		"userAgent"     : "app",
-		"params"        : { "switch" : new_state },
-		"apikey"        : device["apikey"],
-		"deviceid"      : device["deviceid"],
-		"sequence"      : get_time(),
-        }
-        if ("controlType" in device["params"]) {
-		payload["controlType"] = device["params"]["controlType"];
-        } else {
-		payload["controlType"] = 4;
-        }
-        ws.send(JSON.stringify(payload));
+	if (ws["readyState"] == 1) {
+		payload = {
+			"action"        : "update",
+			"userAgent"     : "app",
+			"params"        : { "switch" : new_state },
+			"apikey"        : device["apikey"],
+			"deviceid"      : device["deviceid"],
+			"sequence"      : get_time(),
+		}
+		if ("controlType" in device["params"]) {
+			payload["controlType"] = device["params"]["controlType"];
+		} else {
+			payload["controlType"] = 4;
+		}
+		ws.send(JSON.stringify(payload));
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function do_login() {
@@ -177,7 +190,15 @@ function check_login(user_info) {
 	if (! user_info["bearer_token"] == "") {
 		console.log("Getting devices");
 		device_list = get_device_list(user_info);
-		return device_list;
+		if (device_list["success"] == true) {
+			user_info["devices"] = {};
+			for (device in device_list["devices"]) {
+				var device_id = device_list["devices"][device]["deviceid"];
+				user_info["devices"][device_id] = device_list["devices"][device]
+			}
+			return true;
+		}
+		return false;
 	} else {
 		console.log("No bearer_token");
 		return false;
@@ -191,48 +212,55 @@ function on_login(user_info) {
 	switches.classList.remove("hidden");
 	var loader_div = document.getElementById("loader");
 	loader_div.classList.add("hidden");
-	update_devices(user_info, false, true);
+	redraw_devices(user_info);
 	user_info["ws_address"] = get_ws_address(user_info);
 	user_info["ws"] = get_ws(user_info);
 }
 
-function update_devices(user_info, force_update, loop) {
-	if (force_update == true) {
-		device_list = get_device_list(user_info);
-		user_info["devices"] = device_list["devices"];
-	}
+function redraw_devices(user_info) {
 	var devices = user_info["devices"];
-	var switchesHTML = "<table>";
-	for (device in devices) {
-		console.log(devices[device]);
-		var brand = devices[device]["brandName"];
-		var model = devices[device]["productModel"];
-		var name = devices[device]["name"];
-		var state = devices[device]["params"]["switch"];
-		switchesHTML += "<tr><td>"+brand+" "+model+" "+name+": </td><td>";
+	var switches = document.getElementById("switches");
+	switches.innerHTML = "";
+	var tbl = document.createElement("table");
+	var tbdy = document.createElement("tbody");
+	for (device_id in devices) {
+		var brand = devices[device_id]["brandName"];
+		var model = devices[device_id]["productModel"];
+		var name = devices[device_id]["name"];
+		var state = devices[device_id]["params"]["switch"];
+		var tr = document.createElement("tr");
+		var td = document.createElement("td");
+		td.appendChild(document.createTextNode(brand+" "+model+" "+name+": "))
+		tr.appendChild(td);
+		var td2 = document.createElement("td");
+		var a = document.createElement("a");
+		a.appendChild(document.createTextNode(capitalise(state)));
+		a.classList.add("ui-btn", "ui-btn-inline", "ui-icon-power", "ui-btn-icon-left");
 		if (state == "off") {
-			switchesHTML += '<a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-icon-power ui-btn-icon-left" onclick="toggle('+device+');">Off</a></td></tr>';
-		} else {
-			switchesHTML += '<a href="#" class="ui-btn ui-btn-inline ui-icon-power ui-btn-icon-left" onclick="toggle('+device+');">On</a></td></tr>';
+			a.classList.add("ui-btn-b");
 		}
+		a.onclick = function() { toggle(device_id); };
+		td2.appendChild(a);
+		tr.appendChild(td2);
+		tbdy.appendChild(tr);
 	}
-	switchesHTML += "</table>";
-	document.getElementById("switches").innerHTML = switchesHTML;
-	if (loop == true) {
-		setTimeout(update_devices, 10000, user_info, true, true);
-	}
+	tbl.appendChild(tbdy);
+	switches.appendChild(tbl);
 }
 
-function toggle(device_no) {
-	var device = user_info["devices"][device_no];
+function toggle(device_id) {
+	var device = user_info["devices"][device_id];
 	var state = device["params"]["switch"];
 	if (state == "off") {
 		new_state = "on";
 	} else {
 		new_state = "off";
 	}
-	switch_device(device, user_info, new_state);
-	update_devices(user_info, true, false);
+	var success = switch_device(device, user_info, new_state);
+	if (success == true) {
+		device["params"]["switch"] = new_state;
+		setTimeout(redraw_devices, 500, user_info);
+	}
 }
 
 function on_logout() {
