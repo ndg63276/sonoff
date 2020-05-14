@@ -1,4 +1,4 @@
-const appid = "oeVkj2lYFGnJu5XUtWisfW4utiN4u9Mq";
+const appid = get_text("appid.txt");
 const version = 6;
 var proxyurl = "https://cors-anywhere.herokuapp.com/";
 
@@ -12,16 +12,16 @@ function login(username, password, region) {
 	var app_details = {
 		"password": password,
 		"ts": get_time(),
-		"appid": appid,
+		"appid": appid.deobfuscate(),
 	}
 	if (username.indexOf("@") > -1) {
 		app_details["email"] = username;
 	} else {
 		app_details["phoneNumber"] = username;
 	}
-	var secret="6Nz4n0xA8s8qdxQf2GqurZj2Fs55FUvM";
+	var secret = get_text("appsecret.txt");
 	var nonce = JSON.stringify(app_details);
-	var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256,secret);
+	var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secret.deobfuscate());
 	hmac.update(nonce);
 	var hash = hmac.finalize();
 	var sign = hash.toString(CryptoJS.enc.Base64);
@@ -59,7 +59,7 @@ function get_device_list(user_info) {
 	query_params = {
 		"lang": "en",
 		"version": version,
-		"appid": appid,
+		"appid": appid.deobfuscate(),
 	}
 	var url = "https://"+user_info["region"]+"-api.coolkit.cc:8080/api/user/device";
 	var headers = {
