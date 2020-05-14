@@ -7,7 +7,7 @@ function get_time() {
 	return Math.floor(now.getTime()/1000);
 }
 
-function login(username, password, region) {
+function login(username, password, region, storecreds) {
 	var to_return = {"region": region};
 	var app_details = {
 		"password": password,
@@ -41,11 +41,13 @@ function login(username, password, region) {
 			console.log(json);
 			if ("at" in json) {
 				to_return["bearer_token"] = json["at"];
-				setCookie("bearer_token", json["at"], 24*365);
 				to_return["user_apikey"] = json["user"]["apikey"];
-				setCookie("user_apikey", json["user"]["apikey"], 24*365)
-				setCookie("region", region, 24*365)
 				to_return["logged_in"] = true;
+				if (storecreds == true) {
+					setCookie("bearer_token", json["at"], 24*365);
+					setCookie("user_apikey", json["user"]["apikey"], 24*365)
+					setCookie("region", region, 24*365)
+				}
 			} else {
 				to_return["logged_in"] = false;
 			}
@@ -173,8 +175,9 @@ function do_login() {
 	var username = document.getElementById("username").value;
 	var password = document.getElementById("password").value;
 	var region = document.getElementById("region").value;
+	var storecreds = document.getElementById("storecreds").checked;
 	setTimeout(function(){
-		user_info = login(username, password, region);
+		user_info = login(username, password, region, storecreds);
 		if (user_info["logged_in"] == true) {
 			device_list = get_device_list(user_info);
 			user_info["devices"] = device_list["devices"];
