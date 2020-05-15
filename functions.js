@@ -135,7 +135,7 @@ function get_ws(user_info, lookup) {
 	ws.onmessage = function (event) {
 		var data = JSON.parse(event["data"]);
 		console.log(data);
-		if ("action" in data && data["action"] == "update") {
+		if ("action" in data && data["action"] == "update" && "params" in data && "switch" in data["params"]) {
 			var device_id = data["deviceid"];
 			var new_state = data["params"]["switch"];
 			var device = user_info["devices"][device_id];
