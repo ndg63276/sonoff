@@ -45,10 +45,12 @@ function login(username, password, region, storecreds) {
 			console.log(json);
 			if ("at" in json) {
 				to_return["bearer_token"] = json["at"];
+				to_return["refresh_token"] = json["rt"];
 				to_return["user_apikey"] = json["user"]["apikey"];
 				to_return["logged_in"] = true;
 				if (storecreds == true) {
 					setCookie("bearer_token", json["at"], 24*365);
+					setCookie("refresh_token", json["rt"], 24*365);
 					setCookie("user_apikey", json["user"]["apikey"], 24*365)
 					setCookie("region", region, 24*365)
 				}
@@ -58,6 +60,35 @@ function login(username, password, region, storecreds) {
 		}
 	});
 	return to_return;
+}
+
+function refresh_token(user_info) {
+	console.log("refreshing token");
+	if (region == "cn") {
+		var url = "https://"+user_info["region"]+"-api.coolkit.cn:8080/api/user/refresh";
+	} else {
+		var url = "https://"+user_info["region"]+"-api.coolkit.cc:8080/api/user/refresh";
+	}
+	var params = {
+		"grantType": "refresh",
+		"rt": user_info["refresh_token"],
+		"appid": appid.deobfuscate()
+	}
+	$.ajax({
+		url: proxyurl+url,
+		type: "GET",
+		data: params,
+		dataType: "json",
+		success: function (json) {
+			console.log("new token");
+			if ("at" in json) {
+				user_info["bearer_token"] = json["at"];
+				user_info["refresh_token"] = json["rt"];
+				setCookie("bearer_token", json["at"], 24*365);
+				setCookie("refresh_token", json["rt"], 24*365);
+			}
+		}
+	});
 }
 
 function get_device_list(user_info) {
@@ -217,6 +248,7 @@ function check_login(user_info) {
 				var device_id = device_list["devices"][device]["deviceid"];
 				user_info["devices"][device_id] = device_list["devices"][device]
 			}
+			refresh_token(user_info);
 			return true;
 		}
 		return false;
