@@ -103,6 +103,7 @@ function get_ws_address(user_info, lookup) {
 			var url = "https://"+user_info["region"]+"-disp.coolkit.cn:8080/dispatch/app";
 		} else {
 			var url = "https://"+user_info["region"]+"-disp.coolkit.cc:8080/dispatch/app";
+		}
 		$.ajax({
 			url: proxyurl+url,
 			type: "GET",
