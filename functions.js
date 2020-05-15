@@ -29,7 +29,11 @@ function login(username, password, region, storecreds) {
 		"Authorization" : "Sign " + sign,
 		"Content-Type"  : "application/json;charset=UTF-8"
 	}
-	var url = "https://"+region+"-api.coolkit.cc:8080/api/user/login";
+	if (region == "cn") {
+		var url = "https://"+region+"-api.coolkit.cn:8080/api/user/login";
+	} else {
+		var url = "https://"+region+"-api.coolkit.cc:8080/api/user/login";
+	}
 	$.ajax({
 		url: proxyurl+url,
 		type: "POST",
@@ -63,7 +67,11 @@ function get_device_list(user_info) {
 		"version": version,
 		"appid": appid.deobfuscate(),
 	}
-	var url = "https://"+user_info["region"]+"-api.coolkit.cc:8080/api/user/device";
+	if (region == "cn") {
+		var url = "https://"+user_info["region"]+"-api.coolkit.cn:8080/api/user/device";
+	} else {
+		var url = "https://"+user_info["region"]+"-api.coolkit.cc:8080/api/user/device";
+	}
 	var headers = {
 		"Authorization" : "Bearer " + user_info["bearer_token"],
 		"Content-Type"  : "application/json;charset=UTF-8"
@@ -91,7 +99,10 @@ function get_device_list(user_info) {
 function get_ws_address(user_info, lookup) {
 	if (lookup == true) {
 		var to_return = "";
-		var url = "https://"+user_info["region"]+"-disp.coolkit.cc:8080/dispatch/app";
+		if (region == "cn") {
+			var url = "https://"+user_info["region"]+"-disp.coolkit.cn:8080/dispatch/app";
+		} else {
+			var url = "https://"+user_info["region"]+"-disp.coolkit.cc:8080/dispatch/app";
 		$.ajax({
 			url: proxyurl+url,
 			type: "GET",
