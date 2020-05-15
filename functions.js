@@ -98,7 +98,7 @@ function get_device_list(user_info) {
 
 function get_ws_address(user_info, lookup) {
 	if (lookup == true) {
-		var to_return = "";
+		var to_return = user_info["ws_address"];
 		if (region == "cn") {
 			var url = "https://"+user_info["region"]+"-disp.coolkit.cn:8080/dispatch/app";
 		} else {
@@ -126,12 +126,6 @@ function get_ws(user_info, lookup) {
 		user_info["ws_address"] = get_ws_address(user_info, lookup);
 	}
 	ws = new WebSocket(user_info["ws_address"]);
-	payload = {
-		"action"    : "userOnline",
-		"userAgent" : "app",
-		"at"        : user_info["bearer_token"],
-		"apikey"    : user_info["user_apikey"],
-	}
 	ws.onmessage = function (event) {
 		var data = JSON.parse(event["data"]);
 		console.log(data);
@@ -145,7 +139,8 @@ function get_ws(user_info, lookup) {
 	}
 	ws.onopen = function (event) {
 		console.log("ws open");
-		ws.send(JSON.stringify(payload));
+		ping_ws(user_info, ws);
+		setInterval(ping_ws, 120000, user_info, ws);
 	}
 	ws.onclose = function (event) {
 		console.log("ws closed. Reconnect will be attempted in 1 second.", event.reason);
@@ -154,6 +149,17 @@ function get_ws(user_info, lookup) {
 		}, 1000);
 	};
 	return ws;
+}
+
+function ping_ws(user_info, ws) {
+	payload = {
+		"action"    : "userOnline",
+		"userAgent" : "app",
+		"at"        : user_info["bearer_token"],
+		"apikey"    : user_info["user_apikey"],
+		"sequence"  : get_time(),
+	}
+	ws.send(JSON.stringify(payload));
 }
 
 function switch_device(device, user_info, new_state) {

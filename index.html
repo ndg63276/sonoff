@@ -38,15 +38,13 @@ var user_info = {};
 $( document ).ready(function() {
 	testFirstCookie();
 	document.getElementById("password").onkeydown = function(e){if(e.keyCode == 13){do_login();}};
-	user_info = {"bearer_token": getCookie("bearer_token"), "user_apikey": getCookie("user_apikey"), "region": getCookie("region")};
+	user_info = {"bearer_token": getCookie("bearer_token"), "refresh_token": getCookie("refresh_token"), "user_apikey": getCookie("user_apikey"), "region": getCookie("region")};
 	console.log(user_info);
-	logged_in = check_login(user_info);
-	if (logged_in == true) {
+	user_info["logged_in"] = check_login(user_info);
+	if (user_info["logged_in"] == true) {
 		on_login(user_info);
-		user_info["logged_in"] = true;
 	} else {
 		on_logout();
-		user_info["logged_in"] = false;
 	}
 });
 
