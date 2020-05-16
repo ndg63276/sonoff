@@ -167,6 +167,13 @@ function get_ws(user_info, lookup) {
 			device["params"]["switch"] = new_state;
 			redraw_devices(user_info);
 		}
+		if ("action" in data && data["action"] == "sysmsg" && "params" in data && "online" in data["params"]) {
+			var device_id = data["deviceid"];
+			var new_online = data["params"]["online"];
+			var device = user_info["devices"][device_id];
+			device["online"] = new_online;
+			redraw_devices(user_info);
+		}
 	}
 	ws.onopen = function (event) {
 		console.log("ws open");
@@ -280,6 +287,7 @@ function redraw_devices(user_info) {
 		var brand = devices[device_id]["brandName"];
 		var model = devices[device_id]["productModel"];
 		var name = devices[device_id]["name"];
+		var online = devices[device_id]["online"];
 		var state = devices[device_id]["params"]["switch"];
 		var tr = document.createElement("tr");
 		var td = document.createElement("td");
@@ -287,11 +295,15 @@ function redraw_devices(user_info) {
 		tr.appendChild(td);
 		var td2 = document.createElement("td");
 		var a = document.createElement("a");
-		a.appendChild(document.createTextNode(capitalise(state)));
 		a.classList.add("ui-btn", "ui-btn-inline", "ui-icon-power", "ui-btn-icon-left");
-		if (state == "off") {
+		var label = document.createTextNode(capitalise(state));
+		if (online == false) {
+			a.classList.add("ui-disabled");
+			var label = document.createTextNode("Offline");
+		} else if (state == "off") {
 			a.classList.add("ui-btn-b");
 		}
+		a.appendChild(label);
 		a.onclick = function() { toggle(device_id); };
 		td2.appendChild(a);
 		tr.appendChild(td2);
