@@ -117,7 +117,11 @@ function get_device_list(user_info) {
 		success: function (json) {
 			console.log(json);
 			if (json["error"] == 0) {
-				to_return["devices"] = json["devicelist"];
+				to_return["devices"] = {};
+				for (device in json["devicelist"]) {
+					var device_id = json["devicelist"][device]["deviceid"];
+					to_return["devices"][device_id] = json["devicelist"][device]
+				}
 				to_return["success"] = true;
 			} else {
 				to_return["success"] = false;
@@ -250,11 +254,7 @@ function check_login(user_info) {
 		console.log("Getting devices");
 		device_list = get_device_list(user_info);
 		if (device_list["success"] == true) {
-			user_info["devices"] = {};
-			for (device in device_list["devices"]) {
-				var device_id = device_list["devices"][device]["deviceid"];
-				user_info["devices"][device_id] = device_list["devices"][device]
-			}
+			user_info["devices"] = device_list["devices"];
 			refresh_token(user_info);
 			return true;
 		}
