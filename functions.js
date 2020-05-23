@@ -120,7 +120,7 @@ function get_device_list(user_info) {
 				to_return["devices"] = {};
 				for (device in json["devicelist"]) {
 					var device_id = json["devicelist"][device]["deviceid"];
-					to_return["devices"][device_id] = json["devicelist"][device]
+					to_return["devices"][device_id] = json["devicelist"][device];
 				}
 				to_return["success"] = true;
 			} else {
@@ -282,13 +282,16 @@ function redraw_devices(user_info) {
 	var switches = document.getElementById("switches");
 	switches.innerHTML = "";
 	var tbl = document.createElement("table");
+	tbl.classList.add("table-50");
 	var tbdy = document.createElement("tbody");
 	for (device_id in devices) {
+		var tbdy2 = document.createElement("tbody");
 		var brand = devices[device_id]["brandName"];
 		var model = devices[device_id]["productModel"];
 		var name = devices[device_id]["name"];
 		var online = devices[device_id]["online"];
 		var state = devices[device_id]["params"]["switch"];
+		var timers = devices[device_id]["params"]["timers"];
 		var tr = document.createElement("tr");
 		var td = document.createElement("td");
 		td.appendChild(document.createTextNode(brand+" "+model+" "+name+": "))
@@ -307,10 +310,54 @@ function redraw_devices(user_info) {
 		a.onclick = function() { toggle(device_id); };
 		td2.appendChild(a);
 		tr.appendChild(td2);
-		tbdy.appendChild(tr);
+		var td3 = document.createElement("td");
+		var check = document.createElement("a");
+		check.classList.add("ui-btn", "ui-btn-inline", "ui-icon-clock", "ui-btn-icon-notext", "check-class");
+		check.id = "check-"+device_id;
+		td3.appendChild(check);
+		tr.appendChild(td3);
+		tbdy2.appendChild(tr);
+		tbdy.appendChild(tbdy2);
+		var tbdy3 = document.createElement("tbody");
+		tbdy3.classList.add("toggle-hide");
+		for (timer in timers) {
+			var tr2 = document.createElement("tr");
+			var td4 = document.createElement("td");
+			td4.colSpan = 3;
+			var new_state = capitalise(timers[timer]["do"]["switch"])+" at ";
+			if (timers[timer]["enabled"] == 1) {
+				var enabled = "Enabled - ";
+			} else {
+				var enabled = "Disabled - ";
+			}
+			var timer_regex = /([0-9]+) ([0-9]+) \* \* (.*)/;
+			var times = timers[timer]["at"];
+			var re_match = times.match(timer_regex);
+			console.log(re_match);
+			const weekdays = {0:"Sun",1:"Mon",2:"Tue",3:"Wed",4:"Thu",5:"Fri",6:"Sat"};
+			var days = " on ";
+			for (num in weekdays) {
+				if (re_match[3].includes(num)) {
+					days += weekdays[num]+", ";
+				}
+			}
+			var d = new Date;
+			d.setHours(re_match[2], re_match[1]-d.getTimezoneOffset(), 0, 0);
+			var text = enabled+new_state;
+			text += moment(d).format("HH:mm");
+			text += days.slice(0, -2);
+			td4.appendChild(document.createTextNode(text));
+			tr2.appendChild(td4);
+			tbdy3.appendChild(tr2);
+		}
+		tbdy.appendChild(tbdy3);
 	}
 	tbl.appendChild(tbdy);
 	switches.appendChild(tbl);
+	$(".check-class").click(function() {
+		$(this).parents().next(".toggle-hide").toggle();
+	});
+	$(".toggle-hide").hide();
 }
 
 function toggle(device_id) {
