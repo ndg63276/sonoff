@@ -120,7 +120,7 @@ function get_device_list(user_info) {
 				to_return["devices"] = {};
 				for (device in json["devicelist"]) {
 					var device_id = json["devicelist"][device]["deviceid"];
-					to_return["devices"][device_id] = json["devicelist"][device]
+					to_return["devices"][device_id] = json["devicelist"][device];
 				}
 				to_return["success"] = true;
 			} else {
@@ -295,6 +295,7 @@ function redraw_devices(user_info) {
 		tr.appendChild(td);
 		var td2 = document.createElement("td");
 		var a = document.createElement("a");
+		a.setAttribute("id", "id_"+device_id);
 		a.classList.add("ui-btn", "ui-btn-inline", "ui-icon-power", "ui-btn-icon-left");
 		var label = document.createTextNode(capitalise(state));
 		if (online == false) {
@@ -304,7 +305,7 @@ function redraw_devices(user_info) {
 			a.classList.add("ui-btn-b");
 		}
 		a.appendChild(label);
-		a.onclick = function() { toggle(device_id); };
+		a.onclick = function() { toggle(this); };
 		td2.appendChild(a);
 		tr.appendChild(td2);
 		tbdy.appendChild(tr);
@@ -313,7 +314,8 @@ function redraw_devices(user_info) {
 	switches.appendChild(tbl);
 }
 
-function toggle(device_id) {
+function toggle(element) {
+	device_id = element.id.replace("id_", "");
 	var device = user_info["devices"][device_id];
 	var state = device["params"]["switch"];
 	if (state == "off") {
