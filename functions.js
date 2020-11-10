@@ -312,6 +312,7 @@ function redraw_devices(user_info) {
 	}
 	tbl.appendChild(tbdy);
 	switches.appendChild(tbl);
+	switches.innerHTML += '<br /><div class="in-line-div"><button onclick="logout()" class="ui-btn ui-icon-action ui-btn-icon-left ui-shadow ui-corner-all borderShadow">Logout</button></div>';
 }
 
 function toggle(element) {
@@ -339,3 +340,9 @@ function on_logout() {
 	loader_div.classList.add("hidden");
 }
 
+function logout() {
+	setCookie("bearer_token", "", -1);
+	setCookie("refresh_token", "", -1);
+	setCookie("user_apikey", "", -1);
+	location.reload();
+}
