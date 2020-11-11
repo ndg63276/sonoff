@@ -200,6 +200,7 @@ function ping_ws(user_info, ws) {
 		"at"        : user_info["bearer_token"],
 		"apikey"    : user_info["user_apikey"],
 		"sequence"  : get_time(),
+		"appid"     : appid.deobfuscate(),
 	}
 	ws.send(JSON.stringify(payload));
 }
@@ -312,7 +313,17 @@ function redraw_devices(user_info) {
 	}
 	tbl.appendChild(tbdy);
 	switches.appendChild(tbl);
-	switches.innerHTML += '<br /><div class="in-line-div"><button onclick="logout()" class="ui-btn ui-icon-action ui-btn-icon-left ui-shadow ui-corner-all borderShadow">Logout</button></div>';
+	var br = document.createElement("br");
+	switches.appendChild(br);
+	var dv = document.createElement("div");
+	dv.classList.add("in-line-div");
+	var btn = document.createElement("button");
+	btn.classList.add("ui-btn", "ui-icon-action", "ui-btn-icon-left", "ui-shadow", "ui-corner-all", "borderShadow");
+	btn.onclick = function() { logout(); };
+	var lbl = document.createTextNode("Logout");
+	btn.appendChild(lbl);
+	dv.appendChild(btn);
+	switches.appendChild(dv);
 }
 
 function toggle(element) {
