@@ -1,6 +1,6 @@
 const appid = get_text("appid.txt");
 const version = 6;
-var proxyurl = "https://cors-anywhere.herokuapp.com/";
+var proxyurl = "https://cors.smartathome.co.uk/";
 
 function get_time() {
 	var now = new Date();
