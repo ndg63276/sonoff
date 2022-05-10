@@ -1,3 +1,5 @@
+const defaultAppId = "INSERT_APP_ID_HERE";
+const defaultAppSecret = "INSERT_APP_SECRET_HERE";
 const appid = get_text("appid.txt");
 const version = 6;
 var proxyurl = "https://cors.smartathome.co.uk/";
@@ -12,7 +14,7 @@ function login(username, password, region, storecreds) {
 	var app_details = {
 		"password": password,
 		"ts": get_time(),
-		"appid": appid.deobfuscate(),
+		"appid": typeof(appid) == "string" ? appid.deobfuscate() : defaultAppId,
 	}
 	if (username.indexOf("@") > -1) {
 		app_details["email"] = username;
@@ -21,7 +23,10 @@ function login(username, password, region, storecreds) {
 	}
 	var secret = get_text("appsecret.txt");
 	var nonce = JSON.stringify(app_details);
-	var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secret.deobfuscate());
+	var hmac = CryptoJS.algo.HMAC.create(
+		CryptoJS.algo.SHA256,
+		typeof(secret) == "string" ? secret.deobfuscate() : defaultAppSecret
+	);
 	hmac.update(nonce);
 	var hash = hmac.finalize();
 	var sign = hash.toString(CryptoJS.enc.Base64);
@@ -72,7 +77,7 @@ function refresh_token(user_info) {
 	var params = {
 		"grantType": "refresh",
 		"rt": user_info["refresh_token"],
-		"appid": appid.deobfuscate()
+		"appid": typeof(appid) == "string" ? appid.deobfuscate() : defaultAppId,
 	}
 	$.ajax({
 		url: proxyurl+url,
@@ -96,7 +101,7 @@ function get_device_list(user_info) {
 	query_params = {
 		"lang": "en",
 		"version": version,
-		"appid": appid.deobfuscate(),
+		"appid": typeof(appid) == "string" ? appid.deobfuscate() : defaultAppId,
 	}
 	if (region == "cn") {
 		var url = "https://"+user_info["region"]+"-api.coolkit.cn:8080/api/user/device";
@@ -200,7 +205,7 @@ function ping_ws(user_info, ws) {
 		"at"        : user_info["bearer_token"],
 		"apikey"    : user_info["user_apikey"],
 		"sequence"  : get_time(),
-		"appid"     : appid.deobfuscate(),
+		"appid"     : typeof(appid) == "string" ? appid.deobfuscate() : defaultAppId,
 	}
 	ws.send(JSON.stringify(payload));
 }

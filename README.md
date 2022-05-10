@@ -12,7 +12,7 @@ python serve.py
 3. Navigate to http://localhost:8000 in your browser
 
 ## Known Bugs
-1. Sonoff expects an appid and secret
+1. Sonoff expects an appid and secret, which you will have to get for yourself. Once you have them, insert them into the top of functions.js.
 2. A CORS-anywhere server is required to use the Sonoff API
 
 ## Website
