@@ -1,8 +1,24 @@
 const defaultAppId = "INSERT_APP_ID_HERE";
 const defaultAppSecret = "INSERT_APP_SECRET_HERE";
+// insert the address of your cors anywhere server here, eg
+const defaultCorsServer = "https://cors-anywhere.herokuapp.com/";
+
 const appid = get_text("appid.txt");
 const version = 6;
-var proxyurl = "https://cors.smartathome.co.uk/";
+
+const approvedHosts = [
+	"smartathome.co.uk",
+	"www.smartathome.co.uk",
+	"192.168.1.93:8000",
+	"192.168.1.93:4443"
+]
+
+var proxyurl;
+if (approvedHosts.includes(location.host)) {
+	proxyurl = "https://cors.smartathome.co.uk/";
+} else {
+	proxyurl = defaultCorsServer;
+}
 
 function get_time() {
 	var now = new Date();

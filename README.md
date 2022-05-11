@@ -13,10 +13,10 @@ python serve.py
 
 ## Known Bugs
 1. Sonoff expects an appid and secret, which you will have to get for yourself. Once you have them, insert them into the top of functions.js.
-2. A CORS-anywhere server is required to use the Sonoff API
+2. A CORS-anywhere server is required to use the Sonoff API, see https://github.com/Rob--W/cors-anywhere for help. Once you have set one up, insert the address at the top of functions.js.
 
 ## Website
-This tool is available at https://smartathome.co.uk/sonoff/
+This tool is freely available (without the bugs) at https://smartathome.co.uk/sonoff/
 
 ## SmartAtHome
 All the tools from the SmartAtHome website are available at https://github.com/ndg63276/smartathome
